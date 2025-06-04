@@ -18,3 +18,8 @@ jobs:
         run: bun i
       - name: Run program
         run: bun run index.ts
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          API_KEY_SECRET: ${{ secrets.API_KEY_SECRET }}
+          OAUTH_TOKEN: ${{ secrets.OAUTH_TOKEN }}
+          OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
