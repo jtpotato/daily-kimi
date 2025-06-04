@@ -3,12 +3,13 @@ name: Daily Kimi
 on:
   workflow_dispatch:
   schedule:
-  - cron: "0 17 * * *"
+    - cron: "0 17 * * *"
 
 jobs:
   run-my-job:
     name: Post Picture
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
