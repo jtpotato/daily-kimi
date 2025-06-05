@@ -38,7 +38,7 @@ const randomImage = images[Math.floor(Math.random() * images.length)];
 console.log("Random image chosen:", randomImage);
 
 // temporarily save image to file
-const response = await fetch(randomImage);
+const response = await fetch(randomImage.link);
 const imageBuffer = await response.arrayBuffer();
 await sharp(Buffer.from(imageBuffer)).jpeg().toFile("randomImage.jpg");
 
@@ -48,7 +48,7 @@ let media = await client.v1.uploadMedia("randomImage.jpg", {
 });
 
 client.v2
-  .tweet("", {
+  .tweet(randomImage.caption, {
     media: { media_ids: [media] },
   })
   .then((response) => {
