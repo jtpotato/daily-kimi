@@ -2,6 +2,7 @@ import { UTApi } from "uploadthing/server";
 import sharp from "sharp";
 import fs from "fs";
 import { exit } from "process";
+import { execSync } from "child_process";
 
 // read caption from caption.txt
 const caption = await Bun.file("caption.txt").text();
@@ -37,8 +38,17 @@ if (fs.existsSync(imagesJsonPath)) {
 
 imagesJson.images.push({
   link: urls[0] || "",
-  caption: caption,
+  caption: caption.trim(),
 });
+
+// Stage the updated images.json file
+execSync("git add images.json");
+
+// Commit the changes with a message
+execSync('git commit -m "Update images.json with new image and caption"');
+
+// Push the changes to the remote repository
+execSync("git push");
 
 await Bun.write(imagesJsonPath, JSON.stringify(imagesJson, null, 2));
 console.log("Image uploaded and images.json updated successfully.");
