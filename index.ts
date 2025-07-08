@@ -1,6 +1,11 @@
 import { TwitterApi } from "twitter-api-v2";
 import { images } from "./images.json";
+
+// Define the type for history
+let history: { caption: string; link: string }[] =
+  require("./images.json").history;
 import sharp from "sharp";
+import fs from "fs";
 
 // check if environment variables are set
 if (
@@ -33,9 +38,25 @@ client.v2
     console.error("Error logging in:", error);
   });
 
-// choose a random image from images
-const randomImage = images[Math.floor(Math.random() * images.length)];
+// choose a random image from images that is not in history
+const filteredImages = images.filter((image) => {
+  return !history.some((h) => h.link === image.link);
+});
+
+// if history is longer than 90 percent of images, clear everything but leave the last image
+if (history.length > images.length * 0.9) {
+  console.log("History is too long, clearing history...");
+  history = history.slice(-1);
+}
+
+const randomImage =
+  filteredImages[Math.floor(Math.random() * filteredImages.length)];
 console.log("Random image chosen:", randomImage);
+
+// add to history
+history.push(randomImage);
+// save history to file
+fs.writeFileSync("./images.json", JSON.stringify({ images, history }, null, 2));
 
 // temporarily save image to file
 const response = await fetch(randomImage.link);
