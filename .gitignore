@@ -5,3 +5,7 @@ node_modules
 caption.txt
 imagedump
 imagedump.jpg
+*.jpg
+*.png
+*.jpeg
+*.webp
