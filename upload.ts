@@ -3,6 +3,9 @@ import sharp from "sharp";
 import fs from "fs";
 import { execSync } from "child_process";
 
+// git pull to ensure we have the latest changes
+execSync("git pull");
+
 // read caption from caption.txt
 const caption = await Bun.file("caption.txt").text();
 
