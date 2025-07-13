@@ -1,19 +1,14 @@
-import { UTApi } from "uploadthing/server";
-import sharp from "sharp";
-import fs from "fs";
-import { execSync } from "child_process";
+// Import required modules
 
-// git pull to ensure we have the latest changes
+// Pull latest changes from git
 execSync("git pull");
 
-// read caption from caption.txt
+// Read caption and image buffer
 const caption = await Bun.file("caption.txt").text();
-
-// read buffer from file named 'imagedump' with no extension
 const imageBuffer = await Bun.file("imagedump").arrayBuffer();
-// convert image to jpeg
+
+// Convert image to JPEG and resize if needed
 let jpegBuffer = await sharp(imageBuffer).jpeg().toBuffer();
-// if image width is larger than 1400px width, resize it to 1400px width
 const metadata = await sharp(jpegBuffer).metadata();
 if (metadata.width && metadata.width > 1400) {
   jpegBuffer = await sharp(jpegBuffer)
@@ -22,21 +17,22 @@ if (metadata.width && metadata.width > 1400) {
     .toBuffer();
 }
 
-// save to file for testing
+// Save JPEG for local testing
 fs.writeFileSync("imagedump.jpg", jpegBuffer);
 
-// make blob from jpeg buffer
+// Prepare image for upload
 const blob = new Blob([jpegBuffer], { type: "image/jpeg" });
 const jsFile = new File([blob], "imagedump.jpg", { type: "image/jpeg" });
 
-// upload to uploadthing
+// Upload image to UploadThing
 const utapi = new UTApi({ token: process.env.UPLOADTHING_TOKEN || "" });
 const res = await utapi.uploadFiles([jsFile]);
-
 let urls = res.map((file) => file.data?.ufsUrl);
 
-// edit images.json to include image url and caption.
+// Path to images.json
 const imagesJsonPath = "images.json";
+
+// Load or initialize images.json
 let imagesJson: { images: { link: string; caption: string }[] } = {
   images: [],
 };
@@ -46,20 +42,18 @@ if (fs.existsSync(imagesJsonPath)) {
   imagesJson = JSON.parse(existingData);
 }
 
+// Add new image and caption
 imagesJson.images.push({
   link: urls[0] || "",
   caption: caption.trim(),
 });
 
+// Write updated images.json
 await Bun.write(imagesJsonPath, JSON.stringify(imagesJson, null, 2));
 
-// Stage the updated images.json file
+// Stage, commit, and push changes to git
 execSync("git add images.json");
-
-// Commit the changes with a message
 execSync('git commit -m "Update images.json with new image and caption"');
-
-// Push the changes to the remote repository
 execSync("git push");
 
 console.log("Image uploaded and images.json updated successfully.");
