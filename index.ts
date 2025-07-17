@@ -43,8 +43,8 @@ const filteredImages = images.filter((image) => {
   return !history.some((h) => h.link === image.link);
 });
 
-// if history is longer than 90 percent of images, clear everything but leave the last image
-if (history.length > images.length * 0.9) {
+// if history is the same length as images - 1, reset history
+if (history.length > images.length - 1) {
   console.log("History is too long, clearing history...");
   history = history.slice(-1);
 }
