@@ -38,16 +38,16 @@ client.v2
     console.error("Error logging in:", error);
   });
 
-// choose a random image from images that is not in history
-const filteredImages = images.filter((image) => {
-  return !history.some((h) => h.link === image.link);
-});
-
 // if history is the same length as images - 1, reset history
 if (history.length > images.length - 1) {
   console.log("History is too long, clearing history...");
   history = history.slice(-1);
 }
+
+// choose a random image from images that is not in history
+const filteredImages = images.filter((image) => {
+  return !history.some((h) => h.link === image.link);
+});
 
 const randomImage =
   filteredImages[Math.floor(Math.random() * filteredImages.length)];
