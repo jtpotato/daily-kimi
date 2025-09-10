@@ -1,5 +1,12 @@
 // Import required modules
 
+import { execSync } from "child_process";
+import sharp from "sharp";
+import { UTApi } from "uploadthing/server";
+import fs from "fs";
+
+const testing = false;
+
 // Pull latest changes from git
 execSync("git pull");
 
@@ -18,11 +25,20 @@ if (metadata.width && metadata.width > 1400) {
 }
 
 // Save JPEG for local testing
-fs.writeFileSync("imagedump.jpg", jpegBuffer);
+Bun.write("imagedump.jpg", jpegBuffer);
 
 // Prepare image for upload
+
+// @ts-ignore
 const blob = new Blob([jpegBuffer], { type: "image/jpeg" });
 const jsFile = new File([blob], "imagedump.jpg", { type: "image/jpeg" });
+
+// The rest of this code is destructive. End here if testing.
+
+if (testing) {
+  console.log("Testing mode - exiting before destructive operations.");
+  process.exit(0);
+}
 
 // Upload image to UploadThing
 const utapi = new UTApi({ token: process.env.UPLOADTHING_TOKEN || "" });
