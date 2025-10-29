@@ -1,2 +1,2 @@
 git pull
-bun run index.ts
+$HOME/.bun/bin/bun run index.ts
